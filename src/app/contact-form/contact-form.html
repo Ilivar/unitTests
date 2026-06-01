@@ -1,0 +1,51 @@
+<section class="contact-wrapper">
+  @if (isSubmitted) {
+    <div class="success">
+      <h2>Nachricht gesendet ✓</h2>
+      <p>Vielen Dank! Wir melden uns bald bei dir.</p>
+      <button (click)="reset()">Neues Formular</button>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <h2>Kontakt</h2>
+
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" type="text" formControlName="name" placeholder="Dein Name" />
+        @if (form.get('name')?.invalid && form.get('name')?.touched) {
+          @if (form.get('name')?.hasError('required')) {
+            <span class="error">Name ist erforderlich.</span>
+          } @else if (form.get('name')?.hasError('minlength')) {
+            <span class="error">Name muss mindestens 3 Zeichen haben.</span>
+          }
+        }
+      </div>
+
+      <div class="field">
+        <label for="email">E-Mail</label>
+        <input id="email" type="email" formControlName="email" placeholder="deine@email.de" />
+        @if (form.get('email')?.invalid && form.get('email')?.touched) {
+          @if (form.get('email')?.hasError('required')) {
+            <span class="error">E-Mail ist erforderlich.</span>
+          } @else if (form.get('email')?.hasError('email')) {
+            <span class="error">Ungültige E-Mail-Adresse.</span>
+          }
+        }
+      </div>
+
+      <div class="field">
+        <label for="message">Nachricht</label>
+        <textarea id="message" rows="5" formControlName="message" placeholder="Deine Nachricht …"></textarea>
+        @if (form.get('message')?.invalid && form.get('message')?.touched) {
+          @if (form.get('message')?.hasError('required')) {
+            <span class="error">Nachricht ist erforderlich.</span>
+          } @else if (form.get('message')?.hasError('minlength')) {
+            <span class="error">Nachricht muss mindestens 10 Zeichen haben.</span>
+          }
+        }
+      </div>
+
+      <button type="submit" [disabled]="form.invalid">Senden</button>
+    </form>
+  }
+</section>

@@ -1,0 +1,27 @@
+<div class="greeting-widget">
+  <div class="input-row">
+    <input
+      type="text"
+      [(ngModel)]="name"
+      placeholder="Namen eingeben …"
+      (keydown.enter)="onGreet()"
+    />
+    <button (click)="onGreet()" [disabled]="!name.trim()">Grüßen</button>
+    <button class="reset" (click)="reset()" [disabled]="!result">Reset</button>
+  </div>
+
+  @if (result) {
+    <div class="result">
+      <p class="greeting-text">{{ result }}</p>
+      <p class="validation" [class.valid]="isValid" [class.invalid]="!isValid">
+        <code>isValidName("{{ name }}")</code>
+        &rarr;
+        <strong>{{ isValid }}</strong>
+        <span class="hint">
+          @if (isValid) { (mind. 2 Zeichen ohne führende/nachfolgende Leerzeichen) }
+          @else { (zu kurz oder nur Leerzeichen) }
+        </span>
+      </p>
+    </div>
+  }
+</div>

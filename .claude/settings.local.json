@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /Users/ilivar/Desktop/Dev/Angular/unitTests/src/app/contact-form /Users/ilivar/Desktop/Dev/Angular/unitTests/src/app/greeting)",
+      "Bash(npm test *)"
+    ],
+    "additionalDirectories": [
+      "/Users/ilivar/Desktop/Dev/Angular/unitTests/src/app"
+    ]
+  }
+}
