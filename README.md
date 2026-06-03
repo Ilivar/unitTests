@@ -11,10 +11,11 @@ Dieses Projekt entstand mit dem [Angular CLI](https://github.com/angular/angular
 3. [Projektstruktur und Lernpfad](#3-projektstruktur-und-lernpfad)
 4. [Kernkonzepte](#4-kernkonzepte)
 5. [Die Testdateien im Detail](#5-die-testdateien-im-detail)
-6. [Mocking & Spying](#6-mocking--spying)
-7. [Code Coverage](#7-code-coverage)
-8. [Alle Befehle im Überblick](#8-alle-befehle-im-überblick)
-9. [Weiterführende Links](#9-weiterführende-links)
+6. [Hausaufgabe – Selbstständig üben](#6-hausaufgabe--selbstständig-üben)
+7. [Mocking & Spying](#7-mocking--spying)
+8. [Code Coverage](#8-code-coverage)
+9. [Alle Befehle im Überblick](#9-alle-befehle-im-überblick)
+10. [Weiterführende Links](#10-weiterführende-links)
 
 ---
 
@@ -66,17 +67,20 @@ src/app/
 │   ├── greeting.service.spec.ts      → Service isoliert testen (8 Tests)
 │   ├── greeting.component.ts         → Komponente, die den Service injiziert
 │   └── greeting.component.spec.ts   → Komponente + Spies (12 Tests)
-└── contact-form/
-    ├── contact-form.ts               → Reactive Form mit Validierung
-    └── contact-form.spec.ts          → Formulare + DOM-Interaktion (23 Tests)
+├── contact-form/
+│   ├── contact-form.ts               → Reactive Form mit Validierung
+│   └── contact-form.spec.ts          → Formulare + DOM-Interaktion (24 Tests)
+└── hausaufgabe/
+    ├── hausaufgabe.service.ts        → 20 Hilfsfunktionen (Mathe, Strings, Arrays, Async)
+    └── hausaufgabe.service.spec.ts   → Hausaufgabe: 38 absichtlich fehlerhafte Tests
 ```
 
 **Empfohlene Reihenfolge:**
 
 ```
-app.spec.ts  →  greeting.service.spec.ts  →  greeting.component.spec.ts  →  contact-form.spec.ts
-   ↑                   ↑                           ↑                              ↑
-Einstieg          Services testen            Komponente + Spy             Formulare + DOM
+app.spec.ts  →  greeting.service.spec.ts  →  greeting.component.spec.ts  →  contact-form.spec.ts  →  hausaufgabe.service.spec.ts
+   ↑                   ↑                           ↑                              ↑                             ↑
+Einstieg          Services testen            Komponente + Spy             Formulare + DOM              Selbstständig üben
 ```
 
 ---
@@ -228,17 +232,22 @@ it('sollte den Fallback-Gruß liefern bei leerem Namen', () => {
 
 ---
 
-### `contact-form.spec.ts` – Reactive Forms + DOM (23 Tests)
+### `contact-form.spec.ts` – Reactive Forms + DOM (24 Tests)
 
 Das umfangreichste Beispiel. Zeigt:
 - Controls und Validatoren eines `FormGroup` prüfen
 - `onSubmit()` bei gültigem vs. ungültigem Formular
-- DOM-Interaktion: Button-Zustand, Template-Conditionals
+- DOM-Interaktion: Button-Zustand, Template-Conditionals, `dispatchEvent()`
 
 ```typescript
-it('sollte den Submit-Button deaktivieren, wenn das Formular ungültig ist', () => {
-  const button = fixture.nativeElement.querySelector('button[type="submit"]');
-  expect(button.disabled).toBe(true);
+it('sollte einen Wert per dispatchEvent ins FormControl übertragen', async () => {
+  const nameInput: HTMLInputElement = fixture.nativeElement.querySelector('input[formControlName="name"]');
+  nameInput.value = 'Max Mustermann';
+  nameInput.dispatchEvent(new Event('input'));
+  fixture.detectChanges();
+  await fixture.whenStable();
+
+  expect(component.form.get('name')?.value).toBe('Max Mustermann');
 });
 
 it('sollte die Erfolgsmeldung anzeigen, nachdem das Formular abgeschickt wurde', async () => {
@@ -253,7 +262,44 @@ it('sollte die Erfolgsmeldung anzeigen, nachdem das Formular abgeschickt wurde',
 
 ---
 
-## 6. Mocking & Spying
+## 6. Hausaufgabe – Selbstständig üben
+
+### `hausaufgabe.service.spec.ts` – Alle Matcher in der Praxis (38 Tests)
+
+Diese Datei ist **keine Demonstration, sondern eine Übung**: Alle 38 Tests schlagen absichtlich fehl. Die Aufgabe besteht darin, den `HausaufgabeService` in `hausaufgabe.service.ts` zu lesen und die jeweils falsch gesetzten Erwartungen in den `expect()`-Aufrufen zu korrigieren, bis alle Tests grün sind.
+
+**Abgedeckte Bereiche:**
+
+| Bereich | Funktionen |
+|---|---|
+| Mathematik | `add`, `subtract`, `multiply`, `divide`, `isEven`, `clamp` |
+| Strings | `capitalize`, `reverseString`, `isPalindrome`, `truncate`, `toUpperSnakeCase` |
+| Arrays | `getMax`, `getMin`, `filterEven`, `sumArray`, `removeDuplicates`, `countOccurrences`, `flattenArray`, `groupBy` |
+| Async | `delay` (Promise mit `async/await` und `resolves`) |
+| Spies | `vi.spyOn` mit `toHaveBeenCalled` und `toHaveBeenCalledWith` |
+
+**Abgedeckte Matcher:**
+
+```typescript
+toBe · toEqual · toBeTruthy · toBeFalsy · toBeNull · toBeUndefined
+toContain · toHaveLength · toMatch · toBeGreaterThan · toBeLessThan
+toThrow · resolves · toHaveBeenCalled · toHaveBeenCalledWith · not-Modifier
+```
+
+**Vorgehen:**
+
+1. Tests ausführen: `ng test` – alle Hausaufgaben-Tests sind rot
+2. `hausaufgabe.service.ts` lesen und die Funktion verstehen
+3. Den Kommentar `❌ AUFGABE` im Test lesen – er erklärt, was falsch ist
+4. Den falschen Wert im `expect()` korrigieren
+5. Test wird grün – weiter zum nächsten
+
+> **Hinweis:** Die Lösungsdatei ist aus dem Repository ausgeschlossen (`.gitignore`).
+> Versuche die Aufgaben selbstständig zu lösen, bevor du nachschaust!
+
+---
+
+## 7. Mocking & Spying
 
 Ein **Spy** ist eine Attrappe, die eine echte Methode zur Laufzeit ersetzt – kontrollierbar im Rückgabewert und überprüfbar, ob und womit sie aufgerufen wurde.
 
@@ -282,7 +328,7 @@ Das vollständige Beispiel befindet sich in [greeting.component.spec.ts](src/app
 
 ---
 
-## 7. Code Coverage
+## 8. Code Coverage
 
 Code Coverage misst, **wie viel Prozent des Quellcodes** durch Tests ausgeführt wird. Das Coverage-Paket `@vitest/coverage-v8` ist bereits installiert und konfiguriert – es nutzt Node.js' nativen V8-Coverage-Mechanismus.
 
@@ -371,7 +417,7 @@ In `angular.json` unter `projects → unitTests → architect → test → optio
 
 ---
 
-## 8. Alle Befehle im Überblick
+## 9. Alle Befehle im Überblick
 
 ```bash
 # Tests im Watch-Modus (re-runs bei Dateiänderung)
@@ -398,7 +444,7 @@ ng generate component components/mein-feature
 
 ---
 
-## 9. Weiterführende Links
+## 10. Weiterführende Links
 
 ### Angular
 

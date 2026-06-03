@@ -175,8 +175,25 @@ describe('ContactFormComponent', () => {
   // ── 8. DOM-Interaktion ──────────────────────────────────────────────────────
   // Hier wird gezeigt, wie man Eingaben über das echte DOM simuliert,
   // um den gesamten Datenbindungs-Kreislauf (Template ↔ FormGroup) zu testen.
+  //
+  // dispatchEvent(): Ein echtes Browser-Event (z. B. 'input') auf ein DOM-Element
+  // feuern. Angulars DefaultValueAccessor hört auf diesen Event und überträgt den
+  // Wert automatisch in den dazugehörigen FormControl.
 
   describe('DOM-Interaktion', () => {
+    it('sollte einen Wert per dispatchEvent ins FormControl übertragen', async () => {
+      // dispatchEvent simuliert, was passiert, wenn ein Nutzer in ein Feld tippt:
+      // Der Event 'input' wird auf dem DOM-Element ausgelöst, Angular liest den Wert
+      // aus und aktualisiert den FormControl – ohne dass setValue() nötig ist.
+      const nameInput: HTMLInputElement = fixture.nativeElement.querySelector('input[formControlName="name"]');
+      nameInput.value = 'Max Mustermann';
+      nameInput.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      expect(component.form.get('name')?.value).toBe('Max Mustermann');
+    });
+
     it('sollte den Submit-Button deaktivieren, wenn das Formular ungültig ist', () => {
       const button: HTMLButtonElement = fixture.nativeElement.querySelector('button[type="submit"]');
       expect(button.disabled).toBe(true);
